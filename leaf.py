@@ -1,6 +1,7 @@
 import tensorflow as tf
 import tensorflow_datasets as tfds
 import matplotlib.pyplot as plt
+import numpy as np
 import math
 
 
@@ -140,7 +141,88 @@ beans_logs = beans_classification.fit(
 # 1875/1875 [==============================] - 7s 4ms/step - loss: 0.0428 - accuracy: 0.9859
 
 
+# The code `plt.xlabel("#Y")` sets the label for the x-axis of the plot to "#Y", while
+# `plt.ylabel("#X")` sets the label for the y-axis of the plot to "#X".
 plt.xlabel("#Y")
 plt.ylabel("#X")
 plt.plot(beans_logs.history['loss'])
 
+
+# The code is selecting the first batch of images and labels from the test dataset (`dts_test`) using
+# the `take(1)` method. Then, it converts the selected images and labels to numpy arrays using the
+# `numpy()` method. Finally, it passes the images to the `beans_classification` model to make
+# predictions on the test images and assigns the predictions to the `predictions` variable.
+for image_test, label_test in dts_test.take(1):
+    image_test = image_test.numpy()
+    label_test = label_test.numpy()
+    predictions = beans_classification(image_test)
+    
+    
+def show_image(i, arr_predictions, label_values, images):
+    """
+    The function `show_image` displays an image along with its predicted label and confidence
+    percentage.
+    
+    :param i: The index of the image to be shown
+    :param arr_predictions: arr_predictions is a numpy array containing the predicted probabilities for
+    each class. It has shape (num_classes,) where num_classes is the number of classes in the
+    classification problem
+    :param label_values: The `label_values` parameter is a list or array that contains the true labels
+    or classes for each image in the `images` array. It is used to compare the predicted label with the
+    true label and determine the color of the label text in the plot
+    :param images: The `images` parameter is a list of images. Each image is represented as a numpy
+    array
+    """
+    arr_predictions, label_value, img = arr_predictions[i], label_values[i], images[i]
+    plt.grid(False)
+    plt.xticks([])
+    plt.yticks([])
+
+    plt.imshow(img[...,0], cmap=plt.cm.binary)
+
+    prediction_label = np.argmax(arr_predictions)
+
+    if prediction_label == label_value:
+        color = 'blue'
+    else:
+        color = 'red'
+
+    plt.xlabel("{} {:2.0f}% ({})".format(
+        names_class[prediction_label],
+        100*np.max(arr_predictions),
+        names_class[label_value],
+        color=color
+    ))
+    
+    
+def show_value_prediction(i, arr_predictions, label_value):
+    """
+    The function `show_value_prediction` is used to display the predicted value and the actual value of
+    an image, along with a bar graph showing the probabilities of each class prediction.
+
+    :param i: The index of the prediction and label value to display
+    :param arr_predictions: arr_predictions is a list of predicted values for each class. It contains
+    the predicted probabilities for each class in the range [0, 1]
+    :param label_value: The true label value of the image
+    """
+    arr_predictions, label_value = arr_predictions[i], label_value[i]
+    plt.grid(False)
+    plt.xticks([])
+    plt.yticks([])
+
+    graphics = plt.bar(range(10), arr_predictions, color='#101010')
+    plt.ylim([0, 1])
+    label_prediction = np.argmax(arr_predictions)
+
+    graphics[label_value].set_color('red')
+    graphics[label_prediction].set_color('blue')
+
+    rows = 5
+    columns = 5
+    nums_images = rows * columns
+    plt.figure(figsize=(2*columns, 2*rows))
+    for i in range(nums_images):
+        plt.subplot(rows, 2*columns, 2*i+1)
+        show_image(i, predictions, label_test, image_test)
+        plt.subplot(rows, 2*columns, 2*i+1)
+        show_value_prediction(i, predictions, label_value, image_test)
