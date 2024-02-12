@@ -38,6 +38,8 @@ print(vectorizer.feature_names_, vectorizer.vocabulary_)
 # 'fallecidos': 6
 # }
 
+# The code is using the `FeatureHasher` class from the `sklearn.feature_extraction` module to convert
+# the list of dictionaries (`data`) into a numerical representation using feature hashing.
 hasher_one = FeatureHasher(n_features=10)
 hasher_analysis = hasher_one.fit_transform(data)
 print(hasher_analysis.todense())
@@ -53,6 +55,18 @@ print(hasher_analysis.todense())
 #     0.000e+00  0.000e+00  4.779e+03  0.000e+00]
 # ]
 
+# The code is creating an instance of the `FeatureHasher` class with `n_features=10` and
+# `input_type='string'`. Then, it is using this instance to transform the `data` using the `transform`
+# method. Finally, it is printing the dense representation of the transformed data using the `todense`
+# method.
 hasher_one = FeatureHasher(n_features=10, input_type='string')
 hasher_analysis = hasher_one.transform(data)
 print(hasher_analysis.todense())
+
+
+# [
+#     [ 0.  0.  0.  0.  1.  0.  0. -1.  2.  0.]
+#     [ 0.  0.  0.  0.  1.  0.  0. -1.  2.  0.]
+#     [ 0.  0.  0. -1.  1.  0.  0.  0.  2.  0.]
+#     [-1.  0.  0.  0.  1.  0.  0.  0.  2.  0.]
+# ]
